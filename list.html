@@ -1,0 +1,57 @@
+﻿<html>
+<head>
+    <title>tpl测试</title>
+</head>
+<body>
+    <script>
+    var exp=function(str){
+        return new RegExp(str, 'g');
+    };
+
+    //var parse = function (tpl, d) {
+    //    var that = this, tplog = tpl;
+    //    var jss = exp("^{{", ''), jsse = exp("}}", '');
+
+    //    tpl = tpl
+    //        .replace(exp("{{([^{#}])*?}}"), function (str) {
+    //            return eval(str.replace(/\\/g, '').replace(jss, '').replace(jsse, ''));
+    //    });
+    //    return tpl;
+    //};
+
+    var parse = function (tpl, d) {
+        var jss = exp("^{{", ''), jsse = exp("}}", '');
+
+        tpl = tpl
+            .replace(/[\r\t\n]/g, ' ')
+            .replace(/(?="|')/g, '\\')
+            .replace(exp("{{([^{#}])*?}}"), function (str) {
+                return '"+('+str.replace(/\\/g, '').replace(jss, '').replace(jsse, '')+')+"';
+            });
+        tpl = 'var view = "' + tpl + '";return view;';
+        tpl = new Function('d', tpl);
+        return tpl(d);
+    };
+    </script>
+    <div id="tpl">
+        <h3>{{ d.title }}</h3>
+        <p class="intro">{{ d.intro }}</p>
+        <ul>
+            <li>
+                <span>{{ d.list.name }}</span>
+                <span>所在城市：{{ d.list.city }}</span>
+            </li>
+        </ul>
+    </div>
+    <script>
+    //假设你得到了这么一段数据
+    var data = {
+        title: '标题',
+        intro: '内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容。',
+        list: { name: '测试', city: '上海' }
+    };
+    var tpl = document.getElementById('tpl').innerHTML; //读取模版
+    document.getElementById('tpl').innerHTML = parse(tpl, data);
+    </script>
+</body>
+</html>
